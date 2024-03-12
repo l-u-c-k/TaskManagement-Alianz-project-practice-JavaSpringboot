@@ -84,6 +84,7 @@ public class TaskServiceImpl implements TaskService{
 		//if taskid belongs to userid then we need to return the task data by using modelmapper for converting it to dto and dto to entity
 		return modelMapper.map(task, TaskDto.class);
 	}
+	
 
 	@Override
 	public void deleteTask(long userid, long taskid) {
@@ -101,6 +102,29 @@ public class TaskServiceImpl implements TaskService{
 					throw new APIException(String.format("Task Id %d is not belongs to User Id %d", taskid,userid));
 				}
 				taskRepository.deleteById(taskid); //for deleting the task
+		
+	}
+
+	@Override
+	public TaskDto updateTask(long userid, long taskid, TaskDto updatedTaskDto) {
+		
+		//check whether the user is present or not and if present we need to store the user details in a variable
+		Users users = userRepository.findById(userid).orElseThrow(
+				() -> new UserNotFound(String.format("User Id %d not found", userid))
+				);
+		//here how we are getting the user details in the same way we need to get the tasks also
+		Task existingTask = taskRepository.findById(taskid).orElseThrow(
+				() -> new TaskNotFound(String.format("Task Id %d not found", taskid))
+				);
+		if(users.getId() != existingTask.getUsers().getId()) {
+			throw new APIException(String.format("Task Id %d does not belong to User Id %d", taskid,userid));
+		}
+		//update the existing task with the new data
+		modelMapper.map(updatedTaskDto, existingTask);
+		//save the updated task
+		Task updatedTask = taskRepository.save(existingTask);
+		//convert and return updated task as taskdto
+		return modelMapper.map(updatedTask, TaskDto.class);
 		
 	}
 

@@ -17,6 +17,10 @@ public interface TaskService {
 	//create a method to get an individual task
 	public TaskDto getTask(long userid,long taskid);
 	
+	//to update individual task
+	public TaskDto updateTask(long userid, long taskid,TaskDto updatedTaskDto);
+	
+	
 	//create a method for deleting a task
 	public void deleteTask(long userid,long taskid);
 }

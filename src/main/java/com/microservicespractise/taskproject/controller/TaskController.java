@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.microservicespractise.taskproject.exception.APIException;
+import com.microservicespractise.taskproject.exception.TaskNotFound;
+import com.microservicespractise.taskproject.exception.UserNotFound;
 import com.microservicespractise.taskproject.payload.TaskDto;
 import com.microservicespractise.taskproject.service.TaskService;
+
 
 @RestController
 @RequestMapping("/api")
@@ -62,6 +66,25 @@ public class TaskController {
 			@PathVariable(name="taskid") long taskid
 			){
 		return new ResponseEntity<>(taskService.getTask(userid, taskid),HttpStatus.OK);
+	}
+	
+
+	
+	//update individual task
+	 @org.springframework.web.bind.annotation.PutMapping("/{userid}/tasks/{taskid}")
+	public ResponseEntity<TaskDto> updateTask(
+			@PathVariable(name = "userid") long userid,
+			@PathVariable(name = "taskid") long taskid,
+			@RequestBody TaskDto updatedTaskDto
+			){
+			  try {
+				  TaskDto updatedTask = taskService.updateTask(userid, taskid, updatedTaskDto);
+				  return new ResponseEntity<>(updatedTask,HttpStatus.OK);
+			  }
+			  catch (UserNotFound | TaskNotFound | APIException e) {
+				  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			  }
+		
 	}
 	
 	//delete individual task
